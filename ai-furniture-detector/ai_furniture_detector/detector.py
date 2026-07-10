@@ -1792,7 +1792,9 @@ def _add_linear_slot_diffuser_fallbacks(items: list[DetectedItem], image_bgr: np
     )
 
     if lines is not None:
-        for lx1, ly1, lx2, ly2 in lines[:, 0, :]:
+        normalized_lines = np.asarray(lines).reshape(-1, 4)
+
+        for lx1, ly1, lx2, ly2 in normalized_lines:
             x1, y1 = int(lx1 + roi_x1), int(ly1 + roi_y1)
             x2, y2 = int(lx2 + roi_x1), int(ly2 + roi_y1)
             dx = x2 - x1
@@ -1920,8 +1922,11 @@ def _add_ceiling_vent_fallbacks(items: list[DetectedItem], image_bgr: np.ndarray
     )
 
     raw_boxes: list[list[int]] = []
+
     if lines is not None:
-        for line in lines[:, 0, :]:
+        normalized_lines = np.asarray(lines).reshape(-1, 4)
+
+        for line in normalized_lines:
             lx1, ly1, lx2, ly2 = [int(v) for v in line]
             x1, y1, x2, y2 = lx1 + roi_x1, ly1 + roi_y1, lx2 + roi_x1, ly2 + roi_y1
             dx = x2 - x1
