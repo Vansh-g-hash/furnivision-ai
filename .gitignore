@@ -1,0 +1,41 @@
+# Python environments
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Generated files
+exports/
+dist/
+build/
+*.egg-info/
+
+# Large AI model weights
+*.pt
+*.pth
+*.onnx
+*.safetensors
+
+# Archives
+*.zip
+*.tar
+*.gz
+
+# macOS and editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Logs
+*.log

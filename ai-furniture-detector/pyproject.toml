@@ -1,0 +1,149 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ai-furniture-detector"
+version = "0.2.0"
+description = "Production-grade AI-powered furniture detector with YOLOv8 World, OpenCV visualization, and shopping links."
+readme = {text = "Production-grade AI-powered furniture detector with YOLOv8 World, OpenCV visualization, and shopping links.", content-type = "text/plain"}
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+  {name = "AI Furniture Team"},
+]
+keywords = ["yolov8", "object-detection", "furniture", "computer-vision", "gradio", "fastapi"]
+
+dependencies = [
+  "opencv-python>=4.8.0,<5",
+  "ultralytics>=8.1.0,<9",
+  "gradio>=4.0.0,<5",
+  "fastapi>=0.110.0,<1",
+  "uvicorn[standard]>=0.29.0,<1",
+  "python-multipart>=0.0.9,<1",
+  "pillow>=10.0.0,<11",
+  "huggingface_hub>=0.23.5,<1",
+  "pydantic>=2.0.0,<3",
+  "pydantic-settings>=2.0.0,<3",
+  "python-dotenv>=1.0.0,<2",
+]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Web Environment",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Scientific/Engineering :: Image Recognition",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.4.0,<8",
+  "pytest-asyncio>=0.21.0,<1",
+  "pytest-cov>=4.1.0,<5",
+  "black>=23.9.0,<24",
+  "ruff>=0.1.0,<1",
+  "isort>=5.12.0,<6",
+  "mypy>=1.5.0,<2",
+  "pre-commit>=3.4.0,<4",
+]
+
+[project.urls]
+Homepage = "https://github.com/yourusername/ai-furniture-detector"
+Documentation = "https://github.com/yourusername/ai-furniture-detector#readme"
+Repository = "https://github.com/yourusername/ai-furniture-detector.git"
+Issues = "https://github.com/yourusername/ai-furniture-detector/issues"
+
+[project.scripts]
+ai-furniture-detector = "ai_furniture_detector.cli:main"
+ai-furniture-detector-web = "ai_furniture_detector.web_app:main"
+ai-furniture-detector-api = "ai_furniture_detector.api:main"
+
+[tool.setuptools]
+packages = ["ai_furniture_detector"]
+
+[tool.black]
+line-length = 120
+target-version = ["py39", "py311", "py312"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | venv
+)/
+'''
+
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+select = [
+  "E",    # pycodestyle errors
+  "W",    # pycodestyle warnings
+  "F",    # Pyflakes
+  "I",    # isort
+  "C",    # flake8-comprehensions
+  "B",    # flake8-bugbear
+  "UP",   # pyupgrade
+]
+ignore = [
+  "E501",  # line too long (black handles this)
+  "W505",  # line too long (black handles this)
+]
+
+[tool.isort]
+profile = "black"
+line_length = 120
+multi_line_mode = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+skip_glob = ["*/migrations/*"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--strict-markers -v --tb=short --cov=ai_furniture_detector --cov-report=term-missing --cov-report=html"
+markers = [
+  "slow: marks tests as slow",
+  "integration: marks tests as integration tests",
+]
+
+[tool.coverage.run]
+source = ["ai_furniture_detector"]
+omit = ["*/tests/*", "*/site-packages/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+  "pragma: no cover",
+  "def __repr__",
+  "raise AssertionError",
+  "raise NotImplementedError",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+  "class .*\\bProtocol\\):",
+  "@(abc\\.)?abstractmethod",
+]
