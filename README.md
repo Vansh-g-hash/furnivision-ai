@@ -1,416 +1,523 @@
-# AI Interior Furniture Detection System
+# FurniVision AI
 
-![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
+### AI-powered furniture and interior-element detection for room images
 
-A production-grade, AI-powered furniture detection system using YOLOv8 World and OpenCV. Detects and categorizes furniture and interior elements in room images with clickable shopping links.
+FurniVision AI analyzes interior photographs using **YOLO-World** and **OpenCV**, identifies furniture and room elements, draws annotated detections, groups results by category, and generates useful product-search links.
 
-## ✨ Features
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Hugging%20Face-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/guptavansh/Furnvision-ai)
+[![Source Code](https://img.shields.io/badge/Source%20Code-GitHub-181717?style=for-the-badge&logo=github)](https://github.com/Vansh-g-hash/furnivision-ai)
 
-- **Zero-shot Detection**: YOLOv8 World model detects 35+ furniture and interior items
-- **Interactive UIs**: 
-  - Modern Gradio web interface with dark mode
-  - Native OpenCV window with clickable boxes
-  - REST API with Swagger documentation
-- **Smart Deduplication**: Shows one best detection per item type
-- **Shopping Integration**: One-click links to Amazon India product search
-- **Export Options**: Save annotated images and JSON reports
-- **Production Ready**:
-  - Comprehensive logging and error handling
-  - Type hints throughout
-  - Extensive tests and CI/CD
-  - Docker-ready
-  - Configuration management
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-- Python 3.10+
-- macOS, Linux, or Windows
-
-### Installation
-
-```bash
-# Clone repository
-git clone https://github.com/yourusername/ai-furniture-detector.git
-cd ai-furniture-detector
-
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# Install with all dependencies
-make install-dev
-
-# (Optional) Install pre-commit hooks
-make pre-commit-install
-```
-
-### Run Web UI
-
-```bash
-make run-web
-```
-
-Open http://127.0.0.1:7860 in your browser.
-
-### Run CLI
-
-```bash
-make run-cli
-# or with custom image:
-ai-furniture-detector --source path/to/image.jpg --confidence 0.25
-```
-
-### Run API
-
-```bash
-make run-api
-```
-
-API docs: http://127.0.0.1:8000/docs
-
-## 📚 Documentation
-
-- [Architecture](./ARCHITECTURE.md) - System design and data flow
-- [Contributing](./CONTRIBUTING.md) - Development guidelines
-- [API Guide](./docs/API.md) - REST API reference
-- [Configuration](./docs/CONFIG.md) - Environment variables and settings
-
-## 💻 Usage
-
-### Web UI
-
-1. Upload an interior image
-2. Adjust confidence/IoU thresholds if needed
-3. Click "Run AI Detection"
-4. Browse detected items in sidebar
-5. Click items to open Amazon search
-6. Export JSON or save annotated image
-
-### CLI
-
-```bash
-ai-furniture-detector \
-  --source room.jpg \
-  --confidence 0.25 \
-  --output results.jpg \
-  --output-json results.json
-```
-
-**Options:**
-- `--model`: Path to YOLO weights (default: auto-detect)
-- `--confidence`: Detection threshold 0-1 (default: 0.25)
-- `--iou`: NMS threshold 0-1 (default: 0.70)
-- `--no-show`: Skip OpenCV preview
-- `-v, --verbose`: Enable debug logging
-
-Interactive controls:
-- Click bounding boxes → Open Amazon search
-- Type letters → Filter sidebar
-- Backspace → Delete filter character
-- R → Reset filter
-- Q or ESC → Quit
-
-### REST API
-
-```bash
-# Health check
-curl http://127.0.0.1:8000/health
-
-# Detect furniture
-curl -X POST http://127.0.0.1:8000/api/detect \
-  -F "image=@room.jpg" \
-  -F "confidence=0.25" \
-  -F "iou=0.45" \
-  -F "include_image=true"
-
-# Get product link
-curl "http://127.0.0.1:8000/api/product-link?name=office+chair"
-```
-
-See full [API documentation](./docs/API.md).
-
-## 🏗️ Project Structure
-
-```
-ai-furniture-detector/
-├── ai_furniture_detector/
-│   ├── __init__.py           # Package exports
-│   ├── config.py             # Configuration management
-│   ├── detector.py           # Core detection pipeline
-│   ├── logging_config.py     # Logging setup
-│   ├── cli.py                # Command-line interface
-│   ├── api.py                # FastAPI backend
-│   └── web_app.py            # Gradio web UI
-├── tests/                    # Unit tests
-├── .github/workflows/        # CI/CD pipelines
-├── docs/                     # Documentation
-├── Makefile                  # Development tasks
-├── pyproject.toml            # Dependencies and config
-├── ARCHITECTURE.md           # System design
-├── CONTRIBUTING.md           # Dev guidelines
-└── README.md                 # This file
-```
-
-## 🛠️ Development
-
-### Code Quality
-
-```bash
-# Lint code
-make lint
-
-# Format code
-make format
-
-# Run tests with coverage
-make test-cov
-```
-
-### Testing
-
-```bash
-# Run all tests
-pytest tests/ -v
-
-# Run specific test
-pytest tests/test_detector.py::TestDetectedItem -v
-
-# Generate coverage report
-pytest tests/ --cov=ai_furniture_detector --cov-report=html
-```
-
-### Pre-commit Hooks
-
-```bash
-# Install hooks
-make pre-commit-install
-
-# Run manually
-pre-commit run --all-files
-```
-
-## 📦 Installation Options
-
-### With Development Tools
-
-```bash
-pip install -e ".[dev]"
-```
-
-### Docker
-
-```bash
-docker build -t furniture-detector .
-docker run -p 8000:8000 furniture-detector ai-furniture-detector-api
-```
-
-### From Source
-
-```bash
-git clone https://github.com/yourusername/ai-furniture-detector.git
-cd ai-furniture-detector
-pip install -e .
-```
-
-## 🔧 Configuration
-
-Create `.env` file (copy from `.env.example`):
-
-```bash
-cp .env.example .env
-```
-
-**Key settings:**
-- `MODEL_PATH`: Path to YOLO weights (auto-detected if not set)
-- `DEFAULT_CONFIDENCE`: Detection threshold (0.25)
-- `DEFAULT_IOU`: NMS threshold (0.70)
-- `LOG_LEVEL`: Logging verbosity (INFO, DEBUG, etc.)
-- `API_PORT`: API server port (8000)
-- `WEB_PORT`: Web UI port (7860)
-
-See [Configuration Guide](./docs/CONFIG.md) for all options.
-
-## 📊 Detected Objects
-
-**Furniture**: Chair, Office Chair, Visitor Chair, Sofa, Desk, Table, Center Table, Coffee Table, Cabinet, Shelf, Wall Shelf, Pillow
-
-**Flooring**: Floor Mat, Carpet, Rug
-
-**Lighting**: Ceiling Light, Wall Light, Lamp
-
-**Electronics**: Monitor, Screen, TV
-
-**Doors & Windows**: Door, Window, Glass Door, Sliding Glass Door, Wooden Door
-
-**Decor**: Plant, Potted Plant, Plant Stand, Painting, Wall Painting, Hanging Painting, Clock, Vase
-
-**Other**: Pen Holder, and more via YOLOv8 World's zero-shot capabilities
-
-## 🚨 Performance
-
-- **Detection Time**: ~500-1500ms per image (depends on size and model)
-- **Memory**: ~2-4GB for inference
-- **Model Sizes**:
-  - YOLOv8x-worldv2: 130MB (recommended)
-  - YOLOv8m: 50MB
-  - YOLOv8n: 10MB
-
-### Optimization Tips
-
-1. Use smaller image inputs (< 1920px)
-2. Reduce confidence threshold for faster processing
-3. Run API with multiple workers: `WORKERS=4`
-4. Use GPU if available
-
-## 🐛 Troubleshooting
-
-### Model not found
-
-```bash
-# Download will be attempted automatically
-# Or manually download from Hugging Face and set MODEL_PATH
-```
-
-### Port already in use
-
-```bash
-# App auto-finds next available port, or specify manually:
-API_PORT=8001 ai-furniture-detector-api
-```
-
-### GPU support
-
-```bash
-# PyTorch will auto-detect CUDA if available
-# To force CPU:
-export CUDA_VISIBLE_DEVICES=""
-```
-
-### Memory issues
-
-Use smaller model:
-```bash
-ai-furniture-detector --model yolov8n.pt
-```
-
-## 📝 API Examples
-
-### Python
-
-```python
-import requests
-from pathlib import Path
-
-# Upload image
-with open("room.jpg", "rb") as f:
-    files = {"image": f}
-    data = {"confidence": 0.25, "include_image": False}
-    response = requests.post(
-        "http://127.0.0.1:8000/api/detect",
-        files=files,
-        data=data
-    )
-    result = response.json()
-    print(f"Found {result['unique_count']} unique items")
-```
-
-### JavaScript
-
-```javascript
-const formData = new FormData();
-formData.append('image', fileInput.files[0]);
-formData.append('confidence', 0.25);
-
-const response = await fetch('http://127.0.0.1:8000/api/detect', {
-    method: 'POST',
-    body: formData
-});
-const result = await response.json();
-console.log(`Found ${result.unique_count} items`);
-```
-
-## 📋 Requirements
-
-- Python 3.10+
-- PyTorch
-- OpenCV
-- Ultralytics YOLOv8
-- FastAPI + Uvicorn
-- Gradio
-
-See `pyproject.toml` for complete dependency list.
-
-## 📄 License
-
-MIT License - see [LICENSE](./LICENSE) for details.
-
-## 🤝 Contributing
-
-Contributions welcome! Please see [CONTRIBUTING.md](./CONTRIBUTING.md) for guidelines.
-
-## 🔗 Resources
-
-- [YOLOv8 Documentation](https://docs.ultralytics.com/)
-- [FastAPI Guide](https://fastapi.tiangolo.com/)
-- [Gradio Docs](https://gradio.app/)
-- [OpenCV Tutorials](https://docs.opencv.org/)
-
-## ⭐ Star History
-
-If you find this useful, please consider starring! ⭐
-
-## 📞 Support
-
-- 📖 [Documentation](./docs/)
-- 🐛 [Report Issues](https://github.com/yourusername/ai-furniture-detector/issues)
-- 💬 [Discussions](https://github.com/yourusername/ai-furniture-detector/discussions)
+![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)
+![YOLO](https://img.shields.io/badge/Model-YOLO--World-00FFFF)
+![FastAPI](https://img.shields.io/badge/API-FastAPI-009688?logo=fastapi&logoColor=white)
+![OpenCV](https://img.shields.io/badge/Vision-OpenCV-5C3EE8?logo=opencv&logoColor=white)
+![Gradio](https://img.shields.io/badge/Demo-Gradio-F97316)
+![Deployment](https://img.shields.io/badge/Deployment-Hugging%20Face%20Spaces-FFD21E)
 
 ---
 
-**Made with ❤️ for furniture enthusiasts and developers.**
+## Live Project
 
-- Click any bounding box to open the Amazon product search.
-- Click any sidebar card to open the same product search.
-- Type letters to filter the sidebar.
-- Backspace deletes filter text.
-- `R` resets the filter.
-- `Q` or `Esc` quits.
+### Public demo
 
-## Save Outputs Without Preview
+**Try FurniVision AI here:**
 
-```bash
-ai-furniture-detector \
-  --source ai-furniture-detector/room2.jpg \
-  --output ai-furniture-detector/exports/annotated_latest.jpg \
-  --output-json ai-furniture-detector/exports/detections_latest.json \
-  --no-show
+https://huggingface.co/spaces/guptavansh/Furnvision-ai
+
+The hosted demo allows users to:
+
+- Upload room and interior images
+- Adjust confidence and IoU thresholds
+- Run furniture detection
+- View an annotated output image
+- Review detected items and categories
+- Open relevant Amazon India search links
+
+### Source code
+
+https://github.com/Vansh-g-hash/furnivision-ai
+
+---
+
+## Project Overview
+
+FurniVision AI is an end-to-end computer-vision project designed to detect furniture, fixtures, decor, electronics, flooring, lighting, windows, doors, and other room elements from interior images.
+
+The project combines a zero-shot YOLO-World model with a custom post-processing pipeline built using OpenCV.
+
+Instead of relying only on raw model predictions, the detector also applies:
+
+- Custom furniture and interior prompts
+- Per-class confidence thresholds
+- Bounding-box geometry checks
+- Duplicate removal
+- Context-aware false-positive filtering
+- Category-based grouping
+- Fallback detection for selected room elements
+- Annotated labels and shopping links
+
+The result is a more practical interior-analysis workflow than plain object detection alone.
+
+---
+
+## Key Features
+
+### AI-powered detection
+
+- Uses YOLO-World for zero-shot object detection
+- Supports more than 170 custom furniture and interior prompts
+- Automatically downloads a deployment-friendly model when local weights are unavailable
+- Supports larger local YOLO-World weights when present
+
+### Interior-specific processing
+
+The project includes custom logic for detecting and filtering:
+
+- Chairs and conference chairs
+- Tables, desks, cabinets, shelves, and sideboards
+- Sofas, beds, stools, benches, and storage units
+- Televisions, monitors, laptops, speakers, and projectors
+- Lamps, ceiling lights, and recessed lights
+- Plants, paintings, mirrors, clocks, and decorative objects
+- Doors, windows, glass partitions, and blinds
+- Flooring, carpets, rugs, and wall panels
+- HVAC vents and selected room utilities
+
+### Smart filtering
+
+- Removes duplicate and overlapping detections
+- Uses different confidence thresholds for different classes
+- Rejects detections that are too small or geometrically unlikely
+- Reduces common false positives using room context
+- Groups repeated items such as chairs and ceiling lights
+- Separates raw detections from unique display results
+
+### Interactive applications
+
+- FastAPI-powered local web application
+- Public Gradio demo on Hugging Face Spaces
+- REST detection endpoint
+- Adjustable confidence and IoU controls
+- Annotated detection output
+- Category and item summaries
+- JSON and CSV export in the local application
+- Amazon India product-search integration
+
+---
+
+## Technology Stack
+
+| Area | Technology |
+|---|---|
+| Programming language | Python |
+| Object detection | YOLO-World through Ultralytics |
+| Computer vision | OpenCV |
+| Numerical processing | NumPy |
+| Local web backend | FastAPI |
+| Local server | Uvicorn |
+| Hosted interface | Gradio |
+| Cloud deployment | Hugging Face Spaces |
+| Model execution | PyTorch |
+| Validation and configuration | Pydantic |
+| Version control | Git and GitHub |
+
+---
+
+## How It Works
+
+```text
+User uploads an interior image
+              │
+              ▼
+Image is validated and converted to RGB/BGR
+              │
+              ▼
+YOLO-World runs zero-shot inference
+              │
+              ▼
+Raw bounding boxes and confidence scores are extracted
+              │
+              ▼
+Interior-specific filters remove weak or unlikely results
+              │
+              ▼
+Overlapping detections are deduplicated and grouped
+              │
+              ▼
+Fallback logic adds selected missed room elements
+              │
+              ▼
+Labels and bounding boxes are drawn with OpenCV
+              │
+              ▼
+Annotated image, summary, categories, and product links are returned
 ```
 
-## Detection Tuning
+---
 
-Small interior objects such as lights, clocks, floor mats, and pen holders often need a lower threshold:
+## Detection Pipeline
 
-```bash
-ai-furniture-detector --confidence 0.025 --iou 0.45
+The main detection pipeline is implemented in:
+
+```text
+ai-furniture-detector/ai_furniture_detector/detector.py
 ```
 
-Use a slightly higher threshold, such as `0.08`, if the model returns too many weak detections.
+The pipeline performs the following operations:
 
-## Architecture for Expansion
+1. Loads a local YOLO model when available.
+2. Downloads `yolov8s-worldv2.pt` as a cloud fallback.
+3. Loads the custom furniture and room-element prompt list.
+4. Runs object detection using the selected confidence and IoU values.
+5. Normalizes model labels into consistent display names.
+6. Applies class-specific confidence and minimum-area filters.
+7. Removes duplicate and overlapping bounding boxes.
+8. Applies context-aware false-positive cleanup.
+9. Adds selected fallback detections.
+10. Draws labels and returns structured detection results.
 
-- `detector.py` is framework-independent and can be reused by FastAPI, Flask, Streamlit, or a mobile backend.
-- `DetectedItem.to_dict()` already includes name, confidence, category, coordinates, and product link for database storage.
-- `run_detection()` returns all bounding boxes plus unique sidebar/product entries, which keeps UI and inventory workflows separate.
-- Product links currently target Amazon India, but `build_amazon_link()` can be swapped for a marketplace API, inventory database, or recommendation engine.
-- Category labels are centralized for future analytics, product ranking, and AI design suggestions.
+---
 
-## Troubleshooting
+## Local Installation
 
-- If the model file is missing, confirm `yolov8x-worldv2.pt` exists in the project root or pass `--model /path/to/model.pt`.
-- If OpenCV windows do not appear on macOS, run the command from Terminal with the virtual environment activated.
-- If the web UI package is missing, run `pip install -r requirements.txt` again inside the virtual environment.
-- If detection is slow, try `--model yolov8n.pt` for faster but less interior-specific detection.
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Vansh-g-hash/furnivision-ai.git
+cd furnivision-ai
+```
+
+### 2. Create a virtual environment
+
+#### macOS or Linux
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+#### Windows PowerShell
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+### 3. Install dependencies
+
+```bash
+python3 -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+
+### 4. Start the local application
+
+```bash
+python3 ai-furniture-detector/ai_furniture_detector/web_app.py
+```
+
+Open:
+
+```text
+http://127.0.0.1:7860
+```
+
+The application automatically checks for an available port when running locally.
+
+---
+
+## Using the Local Web Application
+
+1. Open the application in your browser.
+2. Upload a JPG, PNG, JPEG, or WEBP image.
+3. Adjust the confidence threshold.
+4. Adjust the IoU threshold.
+5. Click **Detect Furniture**.
+6. Review the detected items and annotated image.
+7. Filter results by category or search term.
+8. Open available product-search links.
+9. Export the results as JSON or CSV.
+10. Download the annotated image.
+
+---
+
+## REST API
+
+The local FastAPI application exposes a detection endpoint.
+
+### Health check
+
+```bash
+curl http://127.0.0.1:7860/health
+```
+
+Example response:
+
+```json
+{
+  "status": "ok",
+  "app": "FurniVision AI — Furniture Detection Studio"
+}
+```
+
+### Detect furniture
+
+```bash
+curl -X POST http://127.0.0.1:7860/api/detect \
+  -F "image=@room.jpg" \
+  -F "confidence=0.12" \
+  -F "iou=0.50"
+```
+
+The response contains:
+
+- Uploaded filename
+- Original image
+- Annotated image
+- Image dimensions
+- Unique detected items
+- Total detections
+- Bounding boxes
+- Categories
+- Confidence values
+- Product-search links
+- Processing time
+- Model name
+
+---
+
+## Example API Response
+
+```json
+{
+  "ok": true,
+  "filename": "room.jpg",
+  "unique_count": 7,
+  "all_count": 11,
+  "items": [
+    {
+      "name": "conference chair",
+      "display_name": "Conference Chair",
+      "category": "Furniture",
+      "confidence": 0.81,
+      "confidence_percent": 81.0,
+      "count": 1,
+      "bbox": [412, 280, 538, 510],
+      "link": "https://www.amazon.in/s?k=Conference+Chair+furniture"
+    }
+  ],
+  "summary": {
+    "unique_items": 7,
+    "total_detections": 11,
+    "top_category": "Furniture",
+    "avg_confidence": 67.4
+  }
+}
+```
+
+---
+
+## Project Structure
+
+```text
+furnivision-ai/
+│
+├── ai-furniture-detector/
+│   ├── ai_furniture_detector/
+│   │   ├── __init__.py
+│   │   ├── __main__.py
+│   │   ├── api.py
+│   │   ├── cli.py
+│   │   ├── config.py
+│   │   ├── detector.py
+│   │   ├── logging_config.py
+│   │   └── web_app.py
+│   │
+│   ├── detect.py
+│   ├── pyproject.toml
+│   └── TODO.md
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
+├── docs/
+│   ├── API.md
+│   └── CONFIG.md
+│
+├── tests/
+│   ├── __init__.py
+│   └── test_detector.py
+│
+├── .env.example
+├── .gitignore
+├── .pre-commit-config.yaml
+├── ARCHITECTURE.md
+├── CLEANUP_SUMMARY.md
+├── CONTRIBUTING.md
+├── Makefile
+├── README.md
+├── requirements.txt
+└── verify_cleanup.sh
+```
+
+---
+
+## Core Components
+
+### `detector.py`
+
+Contains the main computer-vision pipeline:
+
+- Model loading
+- Custom object prompts
+- Label normalization
+- Confidence filtering
+- Context-aware filtering
+- Duplicate removal
+- Bounding-box annotation
+- Product-link generation
+- Detection result creation
+
+### `web_app.py`
+
+Provides the local FastAPI web application:
+
+- Image uploads
+- Detection settings
+- Browser-based interface
+- REST detection endpoint
+- JSON and CSV export
+- Annotated image download
+- Search and category filters
+
+### `api.py`
+
+Contains reusable API functionality for programmatic integration.
+
+### `cli.py`
+
+Contains command-line interface functionality.
+
+### `config.py`
+
+Handles application settings and environment-based configuration.
+
+---
+
+## Model Handling
+
+FurniVision AI searches for available model weights in the project directory.
+
+Supported local filenames include:
+
+```text
+yolov8x-worldv2.pt
+yolov8s-worldv2.pt
+yolov8m-worldv2.pt
+yolov8m.pt
+yolov8n.pt
+```
+
+When no local model is found, the application automatically downloads:
+
+```text
+yolov8s-worldv2.pt
+```
+
+This provides a smaller and more deployment-friendly fallback for the hosted demo.
+
+Large model files are intentionally excluded from Git because they can be downloaded automatically.
+
+---
+
+## Hosted Deployment
+
+The public demo is deployed using:
+
+- Hugging Face Spaces
+- Gradio
+- ZeroGPU
+- Ultralytics YOLO-World
+- OpenCV headless
+- PyTorch
+
+The hosted application downloads the latest detector source from the GitHub repository when the Space starts.
+
+This keeps the deployed demonstration connected to the main project code.
+
+### Live deployment
+
+https://huggingface.co/spaces/guptavansh/Furnvision-ai
+
+---
+
+## Current Limitations
+
+- Zero-shot detection can still produce false positives in complex scenes.
+- Detection quality depends on lighting, image resolution, camera angle, and object visibility.
+- Small or partially hidden objects may not be detected.
+- The first hosted inference may take longer because the Space and model may need to start.
+- Amazon links currently open search pages rather than matching exact products.
+- The cloud deployment uses a smaller model for better startup time and memory usage.
+- Context filters are optimized mainly for office and indoor-room photographs.
+- Some structural elements may require additional scene-specific tuning.
+
+---
+
+## Future Improvements
+
+- Train or fine-tune a dedicated furniture-detection model
+- Add segmentation masks for more accurate object boundaries
+- Add room-style and interior-design classification
+- Add furniture dimension estimation
+- Add object tracking for video input
+- Add database storage for previous detections
+- Add exact product recommendation using visual similarity
+- Add user accounts and saved projects
+- Add batch image analysis
+- Add PDF inventory reports
+- Add mobile camera support
+- Add 3D room understanding
+- Add furniture placement and design recommendations
+
+---
+
+## Resume Highlights
+
+This project demonstrates experience with:
+
+- Computer vision
+- Zero-shot object detection
+- YOLO-World and Ultralytics
+- OpenCV image processing
+- FastAPI backend development
+- Gradio application development
+- REST API design
+- Cloud deployment
+- Model fallback handling
+- Custom filtering algorithms
+- Data export
+- Git and GitHub workflows
+- Debugging platform-specific inference issues
+
+---
+
+## Author
+
+**Vansh Gupta**
+
+- GitHub: [Vansh-g-hash](https://github.com/Vansh-g-hash)
+- Live project: [FurniVision AI](https://huggingface.co/spaces/guptavansh/Furnvision-ai)
+
+---
+
+## Support
+
+For issues or suggestions, open an issue in the GitHub repository:
+
+https://github.com/Vansh-g-hash/furnivision-ai/issues
+
+---
+
+Built as a practical AI and computer-vision portfolio project.
