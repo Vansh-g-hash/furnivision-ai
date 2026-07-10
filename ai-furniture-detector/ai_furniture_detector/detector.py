@@ -964,20 +964,31 @@ def load_model(model_path: Path | str | None = None):
             "ultralytics is not installed. Run: pip install -r requirements.txt"
         ) from exc
 
-    path = Path(model_path or default_model_path()).expanduser()
+    requested_path = Path(model_path or default_model_path()).expanduser()
 
-    if not path.exists():
-        raise FileNotFoundError(
-            f"YOLO weights not found: {path}\n"
-            "For best detection, place yolov8x-worldv2.pt in the project root."
+    if requested_path.exists():
+        print(f"Loading local model: {requested_path.name}")
+        model = YOLO(str(requested_path))
+    else:
+        # Cloud deployment fallback:
+        # Ultralytics downloads this official YOLO-World model automatically
+        # when local weights are not present in the repository.
+        fallback_model = "yolov8s-worldv2.pt"
+
+        print(
+            f"Local model not found at {requested_path}. "
+            f"Downloading {fallback_model}..."
         )
 
-    model = YOLO(str(path))
+        model = YOLO(fallback_model)
 
     if hasattr(model, "set_classes"):
         try:
             model.set_classes(TARGET_OBJECTS)
-            print(f"YOLO-World custom classes loaded: {len(TARGET_OBJECTS)} objects")
+            print(
+                f"YOLO-World custom classes loaded: "
+                f"{len(TARGET_OBJECTS)} objects"
+            )
         except Exception as exc:
             print(f"Warning: Could not set YOLO-World classes: {exc}")
 
